@@ -1,0 +1,20 @@
+[
+{
+  "directory": "/mnt/server/build",
+  "command": "/usr/bin/c++ -DCARES_STATICLIB -I/mnt/server/build  -o CMakeFiles/protolib.dir/proto/chat.pb.cc.o -c /mnt/server/build/proto/chat.pb.cc",
+  "file": "/mnt/server/build/proto/chat.pb.cc",
+  "output": "CMakeFiles/protolib.dir/proto/chat.pb.cc.o"
+},
+{
+  "directory": "/mnt/server/build",
+  "command": "/usr/bin/c++ -DCARES_STATICLIB -I/mnt/server/build  -o CMakeFiles/protolib.dir/proto/chat.grpc.pb.cc.o -c /mnt/server/build/proto/chat.grpc.pb.cc",
+  "file": "/mnt/server/build/proto/chat.grpc.pb.cc",
+  "output": "CMakeFiles/protolib.dir/proto/chat.grpc.pb.cc.o"
+},
+{
+  "directory": "/mnt/server/build",
+  "command": "/usr/bin/c++ -DCARES_STATICLIB -I/mnt/server/build -std=gnu++20 -Wall -Wextra -Wpedantic -o CMakeFiles/main.dir/src/main.cc.o -c /mnt/server/src/main.cc",
+  "file": "/mnt/server/src/main.cc",
+  "output": "CMakeFiles/main.dir/src/main.cc.o"
+}
+]

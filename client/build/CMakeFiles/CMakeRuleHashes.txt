@@ -1,0 +1,3 @@
+# Hashes of file build rules.
+4cae41e96bf8e6604d7e28283b8a01fd proto/chat.grpc.pb.h
+bf9c6ec279c39d5a825d36437e3cdfad proto/chat.pb.h

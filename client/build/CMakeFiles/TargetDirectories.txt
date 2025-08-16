@@ -1,0 +1,4 @@
+/mnt/client/build/CMakeFiles/protolib.dir
+/mnt/client/build/CMakeFiles/main.dir
+/mnt/client/build/CMakeFiles/edit_cache.dir
+/mnt/client/build/CMakeFiles/rebuild_cache.dir
