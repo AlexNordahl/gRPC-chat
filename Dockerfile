@@ -1,6 +1,6 @@
 FROM ubuntu:24.04
 
-RUN apt-get update && apt-get install -y cmake build-essential git
+RUN apt-get update && apt-get install libncurses-dev && apt-get install -y cmake build-essential git
 
 RUN mkdir -p /deps && cd /deps && \
     git clone --recurse-submodules -b v1.62.0 --depth 1 --shallow-submodules https://github.com/grpc/grpc
