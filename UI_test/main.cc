@@ -10,11 +10,11 @@ void queueMessage()
 {
 	while (true)
 	{
+		std::this_thread::sleep_for(std::chrono::seconds(3));
+
 		mtx.lock();
 		messages.push("Hi");
 		mtx.unlock();
-
-		std::this_thread::sleep_for(std::chrono::seconds(3));
 	}
 }
 
@@ -35,7 +35,8 @@ int main(int argc, char const *argv[])
 			messages.pop();
 			mtx.unlock();
 		}
-		UI.run();
+
+		UI.refresh();
 	}
 
 	t1.join();

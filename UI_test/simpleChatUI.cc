@@ -1,11 +1,7 @@
 #include "simpleChatUI.hh"
 
-void simpleChatUI::run()
+void simpleChatUI::refresh()
 {
-    auto start = std::chrono::steady_clock::now();
-    auto last_incoming = start;
-    int incoming_counter = 1;
-
     draw_messages(win_msgs, chat);
 
     resizeWindow();

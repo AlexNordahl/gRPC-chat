@@ -12,7 +12,7 @@ public:
     simpleChatUI();
     ~simpleChatUI();
 
-    void run();
+    void refresh();
     void addMessage(const std::string& author, const std::string& content);
     
 private:
