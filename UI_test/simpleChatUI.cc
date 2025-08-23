@@ -2,54 +2,53 @@
 
 void simpleChatUI::run()
 {
-    while (true)
-	{
-        // Obsługa resize (gdy terminal zmieni rozmiar)
-        int r, c; getmaxyx(stdscr, r, c);
-        if (r != rows || c != cols) {
-            rows = r; cols = c;
-            wclear(stdscr); refresh();
-            wresize(win_msgs, rows - input_window_height, cols);
-            wresize(win_input, input_window_height, cols);
-            mvwin(win_input, rows - input_window_height, 0);
-            draw_messages(win_msgs, chat);
-            draw_input(win_input, prompt, input);
-        }
+    auto start = std::chrono::steady_clock::now();
+    auto last_incoming = start;
+    int incoming_counter = 1;
 
-        int ch = wgetch(win_input);
-		if (ch == ASCII_ESCAPE) 
-		{
-            break;
-        }
-		else if (ch == ASCII_BACKSPACE || ch == ASCII_DELETE) 
-		{
-            if (!input.empty())
-				input.pop_back();
+    draw_messages(win_msgs, chat);
 
-            draw_input(win_input, prompt, input);
-        } 
-		else if (ch == ASCII_NEW_LINE) 
-		{
-            if (!input.empty()) 
-			{
-                chat.push_back("Ty: " + input);
-                input.clear();
-                draw_messages(win_msgs, chat);
-            }
-            draw_input(win_input, prompt, input);
+    resizeWindow();
 
-        } 
-        else if (isprint(ch)) 
-		{
-            input.push_back(static_cast<char>(ch));
-            draw_input(win_input, prompt, input);
-        }
+    int ch = wgetch(win_input);
+    if (ch == ASCII_ESCAPE) 
+    {
+        return;
     }
+    else if (ch == ASCII_BACKSPACE || ch == ASCII_DELETE) 
+    {
+        if (!input.empty())
+            input.pop_back();
+
+        draw_input(win_input, prompt, input);
+    } 
+    else if (ch == ASCII_NEW_LINE) 
+    {
+        if (!input.empty()) 
+        {
+            chat.push_back("[You] : " + input);
+            input.clear();
+            draw_messages(win_msgs, chat);
+        }
+        draw_input(win_input, prompt, input);
+
+    } 
+    else if (isprint(ch)) 
+    {
+        input.push_back(static_cast<char>(ch));
+        draw_input(win_input, prompt, input);
+    }
+}
+
+void simpleChatUI::addMessage(const std::string &author, const std::string &content)
+{
+    chat.push_back("[" + author + "]: " + content);
 }
 
 simpleChatUI::simpleChatUI()
 {
     initscr();
+    curs_set(0);
     cbreak();
     noecho();
     keypad(stdscr, TRUE);
@@ -95,12 +94,12 @@ void simpleChatUI::draw_messages(WINDOW *win, const std::vector<std::string> &ms
     wrefresh(win);
 }
 
-void simpleChatUI::draw_input(WINDOW *win, const std::string &prompt, const std::string &buf)
+void simpleChatUI::draw_input(WINDOW *win, const std::string &prompt, const std::string &content)
 {
     werase(win);
     box(win, 0, 0);
     int h, w; getmaxyx(win, h, w);
-    std::string view = prompt + buf;
+    std::string view = prompt + content;
 
     if (view.size() > w - 2) 
 	{
@@ -115,4 +114,19 @@ void simpleChatUI::draw_input(WINDOW *win, const std::string &prompt, const std:
 
     wmove(win, 1, curx);
     wrefresh(win);
+}
+
+void simpleChatUI::resizeWindow()
+{
+    int r, c; getmaxyx(stdscr, r, c);
+    if (r != rows || c != cols) 
+    {
+        rows = r; cols = c;
+        wclear(stdscr); refresh();
+        wresize(win_msgs, rows - input_window_height, cols);
+        wresize(win_input, input_window_height, cols);
+        mvwin(win_input, rows - input_window_height, 0);
+        draw_messages(win_msgs, chat);
+        draw_input(win_input, prompt, input);
+    }
 }

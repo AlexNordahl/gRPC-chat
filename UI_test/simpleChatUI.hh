@@ -32,7 +32,8 @@ private:
     const std::string prompt = "> ";
 
     void draw_messages(WINDOW* win, const std::vector<std::string>& msgs);
-    void draw_input(WINDOW* win, const std::string& prompt, const std::string& buf);
+    void draw_input(WINDOW* win, const std::string& prompt, const std::string& content);
+    void resizeWindow();
 };
 
 #endif
