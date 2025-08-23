@@ -16,7 +16,10 @@ protobuf_generate(TARGET protolib LANGUAGE grpc
 GENERATE_EXTENSIONS .grpc.pb.h .grpc.pb.cc
 PLUGIN "protoc-gen-grpc=${grpc_cpp_plugin_location}")
 
-add_executable(main src/main.cc)
+add_executable(main
+    src/main.cc
+    src/simpleChatUI.cc
+)
 
 target_compile_features(main PRIVATE cxx_std_20)
 target_compile_options(main PRIVATE -Wall -Wextra -Wpedantic)

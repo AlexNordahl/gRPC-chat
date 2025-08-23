@@ -1,39 +1,73 @@
 #include <iostream>
 #include <grpcpp/grpcpp.h>
+#include <thread>
+#include <mutex>
 #include "proto/chat.grpc.pb.h"
 #include "proto/chat.pb.h"
+#include "simpleChatUI.h"
+
+std::mutex mtx;
+std::queue<std::string> messageQueue;
+
+void uiThread()
+{
+    simpleChatUI UI;
+
+	while (true)
+	{
+		UI.refresh();
+
+        mtx.lock();
+        std::string input = UI.takeInput();
+        if (!input.empty())
+            messageQueue.push(input);
+        mtx.unlock();
+	}
+}
 
 int main()
 {
     auto channel = grpc::CreateChannel("localhost:50051", grpc::InsecureChannelCredentials());
     auto stub = ChatService::NewStub(channel);
-
-    std::cout << "Enter your username: ";
-    std::string username;
-    std::getline(std::cin >> std::ws, username);
     
     grpc::ClientContext context;
 
     auto stream = stub->Chat(&context);
 
+    std::thread t1(uiThread);
+
+    ChatMessage msg;
+
     while (true)
     {
-        std::cout << "Message: ";
-        std::string text;
-        std::getline(std::cin >> std::ws, text);
+        // ChatMessage msg;
+        // stream->Read(&msg);
 
-        ChatMessage msg;
+        // if (!msg.text().empty())
+        //     UI.addMessage(msg.username(), msg.text());
 
-        stream->Read(&msg);
+        // ChatMessage chatMessage;
 
-        std::cout << "[" << msg.username() << "]: " << msg.text() << "\n";
+        // chatMessage.set_username("Szymon");
+        // chatMessage.set_text("Siema");
 
-        ChatMessage message;
-        message.set_username(username);
-        message.set_text(text);
+        // stream->Write(chatMessage);
 
-        stream->Write(message);
+        if (!messageQueue.empty())
+        {
+            ChatMessage chatMessage;
+            
+            mtx.lock();
+            chatMessage.set_username("Szymon");
+            chatMessage.set_text(messageQueue.front());
+            messageQueue.pop();
+            mtx.unlock();
+
+            stream->Write(chatMessage);
+        }
     }
+
+    t1.join();
 
     return 0;
 }
