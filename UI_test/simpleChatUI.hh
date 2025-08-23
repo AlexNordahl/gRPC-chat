@@ -9,10 +9,17 @@
 class simpleChatUI
 {
 public:
-    
-    void start();
+    simpleChatUI();
+    ~simpleChatUI();
 
+    void run();
+    void addMessage(const std::string& author, const std::string& content);
+    
 private:
+    static constexpr int ASCII_ESCAPE {27};
+    static constexpr int ASCII_BACKSPACE {8};
+    static constexpr int ASCII_DELETE {127};
+    static constexpr int ASCII_NEW_LINE {10};
 
     int rows, cols;
     int input_window_height = 3;

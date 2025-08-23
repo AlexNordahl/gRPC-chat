@@ -1,25 +1,8 @@
 #include "simpleChatUI.hh"
 
-void simpleChatUI::start()
+void simpleChatUI::run()
 {
-    initscr();
-    raw();
-    noecho();
-    keypad(stdscr, TRUE);
-
-    getmaxyx(stdscr, rows, cols);
-
-    win_msgs  = newwin(rows - input_window_height, cols, 0, 0);
-    win_input = newwin(input_window_height, cols, rows - input_window_height, 0);
-    
-    scrollok(win_msgs, TRUE);
-    wtimeout(win_input, 100); // 100 ms
-
-    draw_messages(win_msgs, chat);
-    draw_input(win_input, prompt, input);
-
-    bool running = true;
-    while (running) 
+    while (true)
 	{
         // Obsługa resize (gdy terminal zmieni rozmiar)
         int r, c; getmaxyx(stdscr, r, c);
@@ -34,22 +17,18 @@ void simpleChatUI::start()
         }
 
         int ch = wgetch(win_input);
-        if (ch == ERR) 
+		if (ch == ASCII_ESCAPE) 
 		{
-            // brak klawisza — nic nie rób
-        } 
-		else if (ch == 27) 
-		{ // ESC
-            running = false;
+            break;
         }
-		else if (ch == 127 || ch == 8) 
+		else if (ch == ASCII_BACKSPACE || ch == ASCII_DELETE) 
 		{
-            if (!input.empty()) 
+            if (!input.empty())
 				input.pop_back();
 
             draw_input(win_input, prompt, input);
         } 
-		else if (ch == '\n' || ch == KEY_ENTER) 
+		else if (ch == ASCII_NEW_LINE) 
 		{
             if (!input.empty()) 
 			{
@@ -59,13 +38,36 @@ void simpleChatUI::start()
             }
             draw_input(win_input, prompt, input);
 
-        } else if (isprint(ch)) 
+        } 
+        else if (isprint(ch)) 
 		{
             input.push_back(static_cast<char>(ch));
             draw_input(win_input, prompt, input);
         }
     }
+}
 
+simpleChatUI::simpleChatUI()
+{
+    initscr();
+    cbreak();
+    noecho();
+    keypad(stdscr, TRUE);
+
+    getmaxyx(stdscr, rows, cols);
+
+    win_msgs  = newwin(rows - input_window_height, cols, 0, 0);
+    win_input = newwin(input_window_height, cols, rows - input_window_height, 0);
+    
+    scrollok(win_msgs, TRUE);
+    wtimeout(win_input, 100);
+
+    draw_messages(win_msgs, chat);
+    draw_input(win_input, prompt, input);
+}
+
+simpleChatUI::~simpleChatUI()
+{
     delwin(win_input);
     delwin(win_msgs);
     endwin();

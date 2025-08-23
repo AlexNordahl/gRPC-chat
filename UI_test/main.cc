@@ -4,7 +4,7 @@ int main(int argc, char const *argv[])
 {
 	simpleChatUI UI;
 
-	UI.start();
+	UI.run();
 
 	return 0;
 }
