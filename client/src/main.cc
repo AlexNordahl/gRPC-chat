@@ -7,9 +7,8 @@
 #include "simpleChatUI.h"
 
 std::mutex mtx;
-std::queue<std::string> messageQueue;
 
-void uiThread()
+void uiThread(std::queue<std::string>& messageQueue)
 {
     simpleChatUI UI;
 
@@ -38,7 +37,9 @@ int main()
 
     auto stream = stub->Chat(&context);
 
-    std::thread t1(uiThread);
+    std::queue<std::string> messageQueue;
+
+    std::thread t1(uiThread, std::ref(messageQueue));
 
     while (true)
     {
