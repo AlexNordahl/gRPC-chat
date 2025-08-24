@@ -27,6 +27,10 @@ void uiThread()
 
 int main()
 {
+    // TODO:
+    // dodac testy
+    // rodzielic Read i Write na osobne watki
+
     auto channel = grpc::CreateChannel("localhost:50051", grpc::InsecureChannelCredentials());
     auto stub = ChatService::NewStub(channel);
     
@@ -36,23 +40,8 @@ int main()
 
     std::thread t1(uiThread);
 
-    ChatMessage msg;
-
     while (true)
     {
-        // ChatMessage msg;
-        // stream->Read(&msg);
-
-        // if (!msg.text().empty())
-        //     UI.addMessage(msg.username(), msg.text());
-
-        // ChatMessage chatMessage;
-
-        // chatMessage.set_username("Szymon");
-        // chatMessage.set_text("Siema");
-
-        // stream->Write(chatMessage);
-
         if (!messageQueue.empty())
         {
             ChatMessage chatMessage;
