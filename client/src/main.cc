@@ -43,18 +43,19 @@ int main()
 
     while (true)
     {
+        // spin-waiting, poprawic na condition variable
+        mtx.lock();
         if (!messageQueue.empty())
         {
             ChatMessage chatMessage;
-            
-            mtx.lock();
+
             chatMessage.set_username("Szymon");
             chatMessage.set_text(messageQueue.front());
             messageQueue.pop();
-            mtx.unlock();
 
             stream->Write(chatMessage);
         }
+        mtx.unlock();
     }
 
     t1.join();
