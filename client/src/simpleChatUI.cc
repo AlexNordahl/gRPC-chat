@@ -11,7 +11,7 @@ void simpleChatUI::refresh()
     {
         return;
     }
-    else if (ch == ASCII_BACKSPACE || ch == ASCII_DELETE) 
+    else if (ch == ASCII_BACKSPACE or ch == ASCII_DELETE) 
     {
         if (!input.empty())
             input.pop_back();
@@ -125,7 +125,7 @@ void simpleChatUI::draw_input(WINDOW *win, const std::string &prompt, const std:
 void simpleChatUI::resizeWindow()
 {
     int r, c; getmaxyx(stdscr, r, c);
-    if (r != rows || c != cols) 
+    if (r != rows or c != cols) 
     {
         rows = r; cols = c;
         wclear(stdscr); refresh();
