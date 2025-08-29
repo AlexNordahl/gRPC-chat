@@ -23,7 +23,7 @@ public:
         ChatMessage incoming; 
         while (stream->Read(&incoming))
         {
-            std::cout << "[" << incoming.username() << "]: " << incoming.text() << "\n";
+            std::cout << convertTime(incoming.sent_at(), "[%Y-%m-%d %H:%M]") << " [" << incoming.username() << "]: " << incoming.text() << "\n";
 
             std::lock_guard<std::mutex> lock(clients_mutex);
             for (auto s : clients)
@@ -35,18 +35,26 @@ public:
 
         return grpc::Status::OK;
     }
+
+    std::string convertTime(const google::protobuf::Timestamp& timeStamp, const std::string& format)
+    {
+        time_t t = static_cast<time_t>(timeStamp.seconds());
+        std::tm tm{};
+        localtime_r(&t, &tm);
+
+        std::ostringstream oss;
+        oss << std::put_time(&tm, format.c_str());
+
+        return oss.str();
+    }
 };
 
 int main()
 {
     const std::string address {"localhost:50051"};
-
     ChatServiceImpl service;
-
     grpc::ServerBuilder builder;
-
     builder.AddListeningPort(address, grpc::InsecureServerCredentials());
-
     builder.RegisterService(&service);
 
     std::unique_ptr<grpc::Server> server = builder.BuildAndStart();

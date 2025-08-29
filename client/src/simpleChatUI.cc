@@ -1,4 +1,9 @@
 #include "simpleChatUI.h"
+#include <cctype>
+#include <algorithm>
+#include <sstream>
+#include <iomanip>
+#include <ctime>
 
 void simpleChatUI::refresh()
 {
@@ -20,9 +25,9 @@ void simpleChatUI::refresh()
     } 
     else if (ch == ASCII_NEW_LINE) 
     {
-        if (!input.empty()) 
+        if (!input.empty())
         {
-            chat.push_back("[You] : " + input);
+            chat.push_back(getTimestampFormatted("[%Y-%m-%d %H:%M]") + myUsername + input);
             msgQueue.push(input);
             input.clear();
             draw_messages(win_msgs, chat);
@@ -36,9 +41,9 @@ void simpleChatUI::refresh()
     }
 }
 
-void simpleChatUI::addMessage(const std::string &author, const std::string &content)
+void simpleChatUI::addMessage(const std::string &message)
 {
-    chat.push_back("[" + author + "]: " + content);
+    chat.push_back(message);
 }
 
 std::string simpleChatUI::takeInput()
@@ -51,7 +56,8 @@ std::string simpleChatUI::takeInput()
     return msg;
 }
 
-simpleChatUI::simpleChatUI()
+simpleChatUI::simpleChatUI(std::string myUsername, std::string prompt)
+ : myUsername(myUsername), prompt(prompt) 
 {
     initscr();
     curs_set(0);
@@ -104,7 +110,8 @@ void simpleChatUI::draw_input(WINDOW *win, const std::string &prompt, const std:
 {
     werase(win);
     box(win, 0, 0);
-    int h, w; getmaxyx(win, h, w);
+    [[maybe_unused]] int h, w;
+    getmaxyx(win, h, w);
     std::string view = prompt + content;
 
     if (view.size() > w - 2) 
@@ -135,4 +142,16 @@ void simpleChatUI::resizeWindow()
         draw_messages(win_msgs, chat);
         draw_input(win_input, prompt, input);
     }
+}
+
+std::string simpleChatUI::getTimestampFormatted(const std::string &format)
+{
+    time_t t = static_cast<time_t>(std::time(nullptr));
+    std::tm tm{};
+    localtime_r(&t, &tm);
+
+    std::ostringstream oss;
+    oss << std::put_time(&tm, format.c_str());
+
+    return oss.str();
 }

@@ -19,6 +19,7 @@ PLUGIN "protoc-gen-grpc=${grpc_cpp_plugin_location}")
 add_executable(main
     src/main.cc
     src/simpleChatUI.cc
+    src/timeFunctions.cc
 )
 
 target_compile_features(main PRIVATE cxx_std_20)

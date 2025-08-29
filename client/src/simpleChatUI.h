@@ -5,16 +5,15 @@
 #include <vector>
 #include <queue>
 #include <string>
-#include <chrono>
 
 class simpleChatUI
 {
 public:
-    simpleChatUI();
+    simpleChatUI(std::string myUsername, std::string prompt);
     ~simpleChatUI();
 
     void refresh();
-    void addMessage(const std::string& author, const std::string& content);
+    void addMessage(const std::string& message);
     std::string takeInput();
     
 private:
@@ -32,11 +31,15 @@ private:
     std::vector<std::string> chat;
     std::queue<std::string> msgQueue;
     std::string input;
-    const std::string prompt = "> ";
+    
+    const std::string myUsername;
+    const std::string prompt;
 
     void draw_messages(WINDOW* win, const std::vector<std::string>& msgs);
     void draw_input(WINDOW* win, const std::string& prompt, const std::string& content);
     void resizeWindow();
+
+    std::string getTimestampFormatted(const std::string& format);
 };
 
 #endif
