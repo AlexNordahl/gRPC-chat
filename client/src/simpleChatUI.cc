@@ -5,10 +5,9 @@
 #include <iomanip>
 #include <ctime>
 
-void simpleChatUI::refresh()
+void simpleChatUI::handleInput()
 {
     draw_messages(win_msgs, chat);
-
     resizeWindow();
 
     int ch = wgetch(win_input);
@@ -27,13 +26,11 @@ void simpleChatUI::refresh()
     {
         if (!input.empty())
         {
-            chat.push_back(getTimestampFormatted("[%Y-%m-%d %H:%M]") + myUsername + input);
             msgQueue.push(input);
             input.clear();
-            draw_messages(win_msgs, chat);
         }
         draw_input(win_input, prompt, input);
-    } 
+    }
     else if (isprint(ch))
     {
         input.push_back(static_cast<char>(ch));
@@ -56,8 +53,7 @@ std::string simpleChatUI::takeInput()
     return msg;
 }
 
-simpleChatUI::simpleChatUI(std::string myUsername, std::string prompt)
- : myUsername(myUsername), prompt(prompt) 
+simpleChatUI::simpleChatUI()
 {
     initscr();
     curs_set(0);
@@ -93,7 +89,7 @@ void simpleChatUI::draw_messages(WINDOW *win, const std::vector<std::string> &ms
     int start = (int)msgs.size() > max_lines ? (int)msgs.size() - max_lines : 0;
     int y = 1;
 
-    for (int i = start; i < msgs.size(); ++i, ++y) 
+    for (size_t i = start; i < msgs.size(); ++i, ++y) 
 	{
         std::string line = msgs[i];
 
@@ -113,8 +109,9 @@ void simpleChatUI::draw_input(WINDOW *win, const std::string &prompt, const std:
     [[maybe_unused]] int h, w;
     getmaxyx(win, h, w);
     std::string view = prompt + content;
+    size_t width {static_cast<size_t>(w - 2)};
 
-    if (view.size() > w - 2) 
+    if (view.size() > width) 
 	{
         view = view.substr(view.size() - (w - 2));
     }
@@ -142,16 +139,4 @@ void simpleChatUI::resizeWindow()
         draw_messages(win_msgs, chat);
         draw_input(win_input, prompt, input);
     }
-}
-
-std::string simpleChatUI::getTimestampFormatted(const std::string &format)
-{
-    time_t t = static_cast<time_t>(std::time(nullptr));
-    std::tm tm{};
-    localtime_r(&t, &tm);
-
-    std::ostringstream oss;
-    oss << std::put_time(&tm, format.c_str());
-
-    return oss.str();
 }

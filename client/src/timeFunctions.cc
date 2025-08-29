@@ -16,3 +16,15 @@ std::string convertProtobufTime(const google::protobuf::Timestamp& timeStamp, co
 
     return oss.str();
 }
+
+std::string getTimestampFormatted(const std::string &format)
+{
+    time_t t = static_cast<time_t>(std::time(nullptr));
+    std::tm tm{};
+    localtime_r(&t, &tm);
+
+    std::ostringstream oss;
+    oss << std::put_time(&tm, format.c_str());
+
+    return oss.str();
+}

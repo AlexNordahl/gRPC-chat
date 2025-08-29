@@ -9,10 +9,10 @@
 class simpleChatUI
 {
 public:
-    simpleChatUI(std::string myUsername, std::string prompt);
+    simpleChatUI();
     ~simpleChatUI();
 
-    void refresh();
+    void handleInput();
     void addMessage(const std::string& message);
     std::string takeInput();
     
@@ -32,8 +32,7 @@ private:
     std::queue<std::string> msgQueue;
     std::string input;
     
-    const std::string myUsername;
-    const std::string prompt;
+    const std::string prompt {"> "};
 
     void draw_messages(WINDOW* win, const std::vector<std::string>& msgs);
     void draw_input(WINDOW* win, const std::string& prompt, const std::string& content);

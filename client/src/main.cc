@@ -36,13 +36,15 @@ int main()
 
 void uiThread(std::queue<std::string>& toSendQueue, std::queue<ChatMessage>& incomingQueue)
 {
-    simpleChatUI UI("[You]: ", "# ");
+    const std::string myUsername {"[You]: "};
+    const std::string timeFormat {"%Y-%m-%d %H:%M - "};
+    simpleChatUI UI;
     std::string input;
     ChatMessage chatMsg;
 
 	while (true)
 	{
-		UI.refresh();
+		UI.handleInput();
 
         input = UI.takeInput();
         if (!input.empty())
@@ -50,6 +52,8 @@ void uiThread(std::queue<std::string>& toSendQueue, std::queue<ChatMessage>& inc
             toSendMutex.lock(); 
             toSendQueue.push(input);
             toSendMutex.unlock();
+
+            UI.addMessage(getTimestampFormatted(timeFormat) + myUsername + input);
         }
 
         incomingMutex.lock();
@@ -57,7 +61,7 @@ void uiThread(std::queue<std::string>& toSendQueue, std::queue<ChatMessage>& inc
         {
             chatMsg = incomingQueue.front();
             std::string formattedMsg {
-                convertProtobufTime(chatMsg.sent_at(), "[%Y-%m-%d %H:%M]") 
+                convertProtobufTime(chatMsg.sent_at(), timeFormat) 
                 + "[" + chatMsg.username() + "]: " 
                 + chatMsg.text()
             };
