@@ -13,7 +13,7 @@ public:
     ~simpleChatUI();
 
     void handleInput();
-    void addMessage(const std::string& message);
+    void addMessage(const std::string_view message);
     std::string takeInput();
     
 private:
@@ -35,10 +35,8 @@ private:
     const std::string prompt {"> "};
 
     void draw_messages(WINDOW* win, const std::vector<std::string>& msgs);
-    void draw_input(WINDOW* win, const std::string& prompt, const std::string& content);
+    void draw_input(WINDOW *win, const std::string_view prompt, const std::string_view content);
     void resizeWindow();
-
-    std::string getTimestampFormatted(const std::string& format);
 };
 
 #endif

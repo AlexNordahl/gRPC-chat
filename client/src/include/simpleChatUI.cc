@@ -38,9 +38,9 @@ void simpleChatUI::handleInput()
     }
 }
 
-void simpleChatUI::addMessage(const std::string &message)
+void simpleChatUI::addMessage(const std::string_view message)
 {
-    chat.push_back(message);
+    chat.push_back(message.data());
 }
 
 std::string simpleChatUI::takeInput()
@@ -102,13 +102,13 @@ void simpleChatUI::draw_messages(WINDOW *win, const std::vector<std::string> &ms
     wrefresh(win);
 }
 
-void simpleChatUI::draw_input(WINDOW *win, const std::string &prompt, const std::string &content)
+void simpleChatUI::draw_input(WINDOW *win, const std::string_view prompt, const std::string_view content)
 {
     werase(win);
     box(win, 0, 0);
     [[maybe_unused]] int h, w;
     getmaxyx(win, h, w);
-    std::string view = prompt + content;
+    std::string view = std::string(prompt) + std::string(content);
     size_t width {static_cast<size_t>(w - 2)};
 
     if (view.size() > width) 
