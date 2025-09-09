@@ -3,30 +3,35 @@
 #include <thread>
 #include <mutex>
 #include <unistd.h>
+#include <condition_variable>
 #include "proto/chat.grpc.pb.h"
 #include "proto/chat.pb.h"
 #include "include/simpleChatUI.h"
 #include "include/timeFunctions.h"
-#include "welcomeScreen.h"
+#include "include/welcomeScreen.h"
 
+using clientReaderWriter = std::shared_ptr<grpc::ClientReaderWriter<ChatMessage, ChatMessage>>;
+
+std::condition_variable writeCV;
 std::mutex toSendMutex;
 std::mutex incomingMutex;
 
 void uiThread(std::queue<std::string>& toSendQueue, std::queue<ChatMessage>& incomingQueue);
-void writeThread(std::queue<std::string>& toSendQueue, std::shared_ptr<grpc::ClientReaderWriter<ChatMessage, ChatMessage>>& stream, const std::string_view myUsername);
-void readThread(std::queue<ChatMessage>& incomingQueue,  std::shared_ptr<grpc::ClientReaderWriter<ChatMessage, ChatMessage>>& stream);
+void writeThread(std::queue<std::string>& toSendQueue, clientReaderWriter& stream, const std::string_view myUsername);
+void readThread(std::queue<ChatMessage>& incomingQueue,  clientReaderWriter& stream);
 
 int main()
 {
     auto channel {grpc::CreateChannel("localhost:50051", grpc::InsecureChannelCredentials())};
     auto stub {ChatService::NewStub(channel)};
     grpc::ClientContext context;
-    std::shared_ptr<grpc::ClientReaderWriter<ChatMessage, ChatMessage>> stream {stub->Chat(&context)};
+    clientReaderWriter stream {stub->Chat(&context)};
 
     std::queue<std::string> toSendQueue;
     std::queue<ChatMessage> incomingQueue;
 
     std::string username {};
+
     {
         welcomeScreen ws;
         ws.start();
@@ -56,9 +61,9 @@ void uiThread(std::queue<std::string>& toSendQueue, std::queue<ChatMessage>& inc
         input = UI.takeInput();
         if (!input.empty())
         {
-            toSendMutex.lock(); 
+            std::lock_guard<std::mutex> lg(toSendMutex);
             toSendQueue.push(input);
-            toSendMutex.unlock();
+            writeCV.notify_one();
 
             UI.addMessage(getTimestampFormatted(timeFormat) + myUsername + input);
         }
@@ -81,31 +86,27 @@ void uiThread(std::queue<std::string>& toSendQueue, std::queue<ChatMessage>& inc
 	}
 }
 
-void writeThread(std::queue<std::string>& toSendQueue, std::shared_ptr<grpc::ClientReaderWriter<ChatMessage, ChatMessage>>& stream, const std::string_view username)
+void writeThread(std::queue<std::string>& toSendQueue, clientReaderWriter& stream, const std::string_view username)
 {
-    ChatMessage chatMessage;
-
     while (true)
     {
-        // spin-waiting, poprawic na condition variable
-        toSendMutex.lock();
-        if (!toSendQueue.empty())
-        {
-            google::protobuf::Timestamp* ts = chatMessage.mutable_sent_at();
-            ts->set_seconds(std::time(nullptr));
+        std::unique_lock<std::mutex> ul(toSendMutex);
+        writeCV.wait(ul, [&]{ return !toSendQueue.empty(); });
 
-            chatMessage.set_username(username);
-            chatMessage.set_text(toSendQueue.front());
-            
-            toSendQueue.pop();
+        ChatMessage chatMessage;
+        google::protobuf::Timestamp* ts = chatMessage.mutable_sent_at();
+        ts->set_seconds(std::time(nullptr));
 
-            stream->Write(chatMessage);
-        }
-        toSendMutex.unlock();
+        chatMessage.set_username(username);
+        chatMessage.set_text(toSendQueue.front());
+        
+        toSendQueue.pop();
+
+        stream->Write(chatMessage);
     }
 }
 
-void readThread(std::queue<ChatMessage>& incomingQueue,  std::shared_ptr<grpc::ClientReaderWriter<ChatMessage, ChatMessage>>& stream)
+void readThread(std::queue<ChatMessage>& incomingQueue, clientReaderWriter& stream)
 {
     while (true)
     {

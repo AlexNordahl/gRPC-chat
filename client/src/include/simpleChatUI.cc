@@ -5,6 +5,33 @@
 #include <iomanip>
 #include <ctime>
 
+simpleChatUI::simpleChatUI()
+{
+    initscr();
+    curs_set(0);
+    cbreak();
+    noecho();
+    keypad(stdscr, TRUE);
+
+    getmaxyx(stdscr, rows, cols);
+
+    win_msgs  = newwin(rows - input_window_height, cols, 0, 0);
+    win_input = newwin(input_window_height, cols, rows - input_window_height, 0);
+    
+    scrollok(win_msgs, TRUE);
+    wtimeout(win_input, 100);
+
+    draw_messages(win_msgs, chat);
+    draw_input(win_input, prompt, input);
+}
+
+simpleChatUI::~simpleChatUI()
+{
+    delwin(win_input);
+    delwin(win_msgs);
+    endwin();
+}
+
 void simpleChatUI::handleInput()
 {
     draw_messages(win_msgs, chat);
@@ -51,33 +78,6 @@ std::string simpleChatUI::takeInput()
     std::string msg = msgQueue.front();
     msgQueue.pop();
     return msg;
-}
-
-simpleChatUI::simpleChatUI()
-{
-    initscr();
-    curs_set(0);
-    cbreak();
-    noecho();
-    keypad(stdscr, TRUE);
-
-    getmaxyx(stdscr, rows, cols);
-
-    win_msgs  = newwin(rows - input_window_height, cols, 0, 0);
-    win_input = newwin(input_window_height, cols, rows - input_window_height, 0);
-    
-    scrollok(win_msgs, TRUE);
-    wtimeout(win_input, 100);
-
-    draw_messages(win_msgs, chat);
-    draw_input(win_input, prompt, input);
-}
-
-simpleChatUI::~simpleChatUI()
-{
-    delwin(win_input);
-    delwin(win_msgs);
-    endwin();
 }
 
 void simpleChatUI::draw_messages(WINDOW *win, const std::vector<std::string> &msgs)
