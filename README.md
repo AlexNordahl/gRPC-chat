@@ -1,4 +1,4 @@
-# Simple gRPC Chat Application
+# gRPC Chat Application
 
 This project is a simple terminal-based chat client implemented in **C++** using **gRPC** and **Protocol Buffers**.  
 It demonstrates how to build a bidirectional streaming application where multiple users can exchange messages in real time.
