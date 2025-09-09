@@ -8,10 +8,10 @@
 SimpleChatUI::SimpleChatUI()
 {
     initscr();
-    curs_set(0);
     cbreak();
     noecho();
     keypad(stdscr, TRUE);
+    curs_set(1);
 
     getmaxyx(stdscr, rows, cols);
 
@@ -20,6 +20,9 @@ SimpleChatUI::SimpleChatUI()
     
     scrollok(win_msgs, TRUE);
     wtimeout(win_input, 100);
+
+    keypad(win_input, TRUE);
+    keypad(win_msgs, TRUE);
 
     draw_messages(win_msgs, chat);
     draw_input(win_input, prompt, input);
@@ -42,7 +45,7 @@ void SimpleChatUI::handleInput()
     {
         return;
     }
-    else if (ch == ASCII_BACKSPACE or ch == ASCII_DELETE) 
+    else if (ch == ASCII_BACKSPACE or ch == KEY_BACKSPACE or ch == ASCII_DELETE) 
     {
         if (!input.empty())
             input.pop_back();

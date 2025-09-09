@@ -10,6 +10,7 @@ WelcomeScreen::WelcomeScreen()
     noecho();
     keypad(stdscr, TRUE);
     curs_set(1);
+    
     resizeWindow();
 }
 
