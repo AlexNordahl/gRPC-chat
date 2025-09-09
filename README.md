@@ -7,16 +7,15 @@ It demonstrates how to build a bidirectional streaming application where multipl
 - Terminal chat interface  
 - User login with username validation  
 - Real-time message exchange over gRPC streams  
-- Message timestamps  
-- Multithreading with `std::jthread`, `std::mutex`, and `std::condition_variable`  
+- Message timestamps
 
 ## Project Structure
-- `proto/` – gRPC service definition and generated code (`chat.proto`, `chat.pb.h`, `chat.grpc.pb.h`)  
+- `proto/` – gRPC service definition
 - `include/` – helper classes (`SimpleChatUI`, `timeFunctions`, `welcomeScreen`)  
 - `main.cpp` – entry point with client logic  
 
 ## Requirements
-- C++20 compiler (e.g. GCC 11+ or Clang 12+)  
+- C++20 compiler 
 - gRPC and Protocol Buffers installed
 - ncurses installed
 - CMake (recommended for building)  
@@ -26,3 +25,8 @@ It demonstrates how to build a bidirectional streaming application where multipl
 mkdir build && cd build
 cmake ..
 make
+```
+## Planned Features
+- Messages stored in database (SQLite)
+- Ability to scroll back to prevoius messages
+- Colored usernames and UI
