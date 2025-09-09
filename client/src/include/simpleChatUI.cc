@@ -5,7 +5,7 @@
 #include <iomanip>
 #include <ctime>
 
-simpleChatUI::simpleChatUI()
+SimpleChatUI::SimpleChatUI()
 {
     initscr();
     curs_set(0);
@@ -25,14 +25,14 @@ simpleChatUI::simpleChatUI()
     draw_input(win_input, prompt, input);
 }
 
-simpleChatUI::~simpleChatUI()
+SimpleChatUI::~SimpleChatUI()
 {
     delwin(win_input);
     delwin(win_msgs);
     endwin();
 }
 
-void simpleChatUI::handleInput()
+void SimpleChatUI::handleInput()
 {
     draw_messages(win_msgs, chat);
     resizeWindow();
@@ -65,12 +65,12 @@ void simpleChatUI::handleInput()
     }
 }
 
-void simpleChatUI::addMessage(const std::string_view message)
+void SimpleChatUI::addMessage(const std::string_view message)
 {
     chat.push_back(message.data());
 }
 
-std::string simpleChatUI::takeInput()
+std::string SimpleChatUI::takeInput()
 {
     if (msgQueue.empty())
         return "";
@@ -80,7 +80,7 @@ std::string simpleChatUI::takeInput()
     return msg;
 }
 
-void simpleChatUI::draw_messages(WINDOW *win, const std::vector<std::string> &msgs)
+void SimpleChatUI::draw_messages(WINDOW *win, const std::vector<std::string> &msgs)
 {
     werase(win);
     box(win, 0, 0);
@@ -102,7 +102,7 @@ void simpleChatUI::draw_messages(WINDOW *win, const std::vector<std::string> &ms
     wrefresh(win);
 }
 
-void simpleChatUI::draw_input(WINDOW *win, const std::string_view prompt, const std::string_view content)
+void SimpleChatUI::draw_input(WINDOW *win, const std::string_view prompt, const std::string_view content)
 {
     werase(win);
     box(win, 0, 0);
@@ -126,7 +126,7 @@ void simpleChatUI::draw_input(WINDOW *win, const std::string_view prompt, const 
     wrefresh(win);
 }
 
-void simpleChatUI::resizeWindow()
+void SimpleChatUI::resizeWindow()
 {
     int r, c; getmaxyx(stdscr, r, c);
     if (r != rows or c != cols) 

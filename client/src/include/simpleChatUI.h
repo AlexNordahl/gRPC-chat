@@ -6,11 +6,11 @@
 #include <queue>
 #include <string>
 
-class simpleChatUI
+class SimpleChatUI
 {
 public:
-    simpleChatUI();
-    ~simpleChatUI();
+    SimpleChatUI();
+    ~SimpleChatUI();
 
     void handleInput();
     void addMessage(const std::string_view message);

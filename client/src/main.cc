@@ -33,7 +33,7 @@ int main()
     std::string username {};
 
     {
-        welcomeScreen ws;
+        WelcomeScreen ws;
         ws.start();
         if (!ws.nick().empty())
         username = ws.nick();
@@ -50,7 +50,7 @@ void uiThread(std::queue<std::string>& toSendQueue, std::queue<ChatMessage>& inc
 {
     const std::string myUsername {"[You]: "};
     const std::string timeFormat {"[%Y-%m-%d %H:%M] "};
-    simpleChatUI UI;
+    SimpleChatUI UI;
     std::string input;
     ChatMessage incomingMsg;
 

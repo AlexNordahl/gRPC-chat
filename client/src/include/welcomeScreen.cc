@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <cctype>
 
-welcomeScreen::welcomeScreen()
+WelcomeScreen::WelcomeScreen()
 {
     initscr();
     cbreak();
@@ -12,13 +12,13 @@ welcomeScreen::welcomeScreen()
     resizeWindow();
 }
 
-welcomeScreen::~welcomeScreen()
+WelcomeScreen::~WelcomeScreen()
 {
     delwin(win_input);
     endwin();
 }
 
-void welcomeScreen::start()
+void WelcomeScreen::start()
 {
     while (true)
     {
@@ -57,7 +57,7 @@ void welcomeScreen::start()
     }
 }
 
-void welcomeScreen::draw_input(WINDOW *win, const std::string& prompt, const std::string &content)
+void WelcomeScreen::draw_input(WINDOW *win, const std::string& prompt, const std::string &content)
 {
     werase(win);
     box(win, 0, 0);
@@ -81,7 +81,7 @@ void welcomeScreen::draw_input(WINDOW *win, const std::string& prompt, const std
     wrefresh(win);
 }
 
-void welcomeScreen::resizeWindow()
+void WelcomeScreen::resizeWindow()
 {
     clear();
     refresh();

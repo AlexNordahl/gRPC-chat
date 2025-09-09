@@ -59,8 +59,6 @@ int main()
 
     std::unique_ptr<grpc::Server> server = builder.BuildAndStart();
 
-    std::cout << "Server started\n";
-
     server->Wait();
 
     return 0;

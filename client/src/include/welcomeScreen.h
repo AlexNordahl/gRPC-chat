@@ -4,11 +4,11 @@
 #include <ncurses.h>
 #include <string>
 
-class welcomeScreen
+class WelcomeScreen
 {
 public:
-    welcomeScreen();
-    ~welcomeScreen();
+    WelcomeScreen();
+    ~WelcomeScreen();
 
     void start();
 
