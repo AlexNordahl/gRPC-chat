@@ -1,6 +1,7 @@
 #include "welcomeScreen.h"
 #include <algorithm>
 #include <cctype>
+#include <cassert>
 
 WelcomeScreen::WelcomeScreen()
 {
@@ -45,16 +46,31 @@ void WelcomeScreen::start()
         }
         else if (ch == ASCII_NEW_LINE)
         {
+            if (input.size() < usernameSizeMin)
+                continue;
+
             if (!input.empty())
                 break;
         }
         else if (isprint(ch))
         {
-            input.push_back(static_cast<char>(ch));
+            if (input.size() < usernameSizeLimit and std::isalnum(ch))
+            {
+                input.push_back(static_cast<char>(ch));
+            }
         }
 
         draw_input(win_input, prompt, input);
     }
+}
+
+void WelcomeScreen::setUsernameSizeBounds(int min, int limit)
+{
+    assert(min > 0);
+    assert(limit > 0);
+
+    usernameSizeMin = min;
+    usernameSizeLimit = limit;
 }
 
 void WelcomeScreen::draw_input(WINDOW *win, const std::string& prompt, const std::string &content)

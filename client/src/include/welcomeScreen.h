@@ -11,8 +11,8 @@ public:
     ~WelcomeScreen();
 
     void start();
-
-    const std::string& nick() const { return input; }
+    void setUsernameSizeBounds(int min, int limit);
+    const std::string& username() const { return input; }
 
 private:
     void draw_input(WINDOW *win, const std::string &prompt, const std::string &content);
@@ -23,6 +23,9 @@ private:
     static constexpr int ASCII_DELETE {127};
     static constexpr int ASCII_NEW_LINE {10};
 
+    size_t usernameSizeMin {5};
+    size_t usernameSizeLimit {15};
+    
     WINDOW* win_input {nullptr};
 
     std::string input;
