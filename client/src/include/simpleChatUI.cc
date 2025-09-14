@@ -11,7 +11,11 @@ SimpleChatUI::SimpleChatUI()
     cbreak();
     noecho();
     keypad(stdscr, TRUE);
-    curs_set(1);
+    curs_set(0);
+
+    start_color();
+	init_pair(1, COLOR_BLACK, COLOR_CYAN);
+    init_pair(2, COLOR_WHITE, COLOR_CYAN);
 
     getmaxyx(stdscr, rows, cols);
 
@@ -26,6 +30,9 @@ SimpleChatUI::SimpleChatUI()
 
     draw_messages(win_msgs, chat);
     draw_input(win_input, prompt, input);
+
+    wbkgd(win_msgs, COLOR_PAIR(1));
+    wbkgd(win_input, COLOR_PAIR(1));
 }
 
 SimpleChatUI::~SimpleChatUI()
@@ -99,7 +106,9 @@ void SimpleChatUI::draw_messages(WINDOW *win, const std::vector<std::string> &ms
         if ((int)line.size() > w - 2)
             line.resize(w - 2);
 
+        wattron(win, COLOR_PAIR(2));
         mvwprintw(win, y, 1, "%s", line.c_str());
+        wattroff(win, COLOR_PAIR(2));
     }
 
     wrefresh(win);
@@ -119,6 +128,7 @@ void SimpleChatUI::draw_input(WINDOW *win, const std::string_view prompt, const 
         view = view.substr(view.size() - (w - 2));
     }
 	
+
     mvwprintw(win, 1, 1, "%s", view.c_str());
     int curx = 1 + (int)view.size();
 

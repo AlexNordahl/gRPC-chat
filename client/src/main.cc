@@ -37,13 +37,13 @@ int main()
         ws.setUsernameSizeBounds(4, 15);
         ws.start();
         if (!ws.username().empty())
-        username = ws.username();
+            username = ws.username();
     }
 
     std::jthread t1(uiThread, std::ref(toSendQueue), std::ref(incomingQueue), username);
     std::jthread t2(writeThread, std::ref(toSendQueue), std::ref(stream), username);
     std::jthread t3(readThread, std::ref(incomingQueue), std::ref(stream));
-    
+
     return 0;
 }
 
