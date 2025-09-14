@@ -5,8 +5,9 @@
 #include <vector>
 #include <queue>
 #include <string>
+#include "BaseUI.h"
 
-class SimpleChatUI
+class SimpleChatUI : public BaseUI
 {
 public:
     SimpleChatUI();
@@ -17,20 +18,14 @@ public:
     std::string takeInput();
     
 private:
-    static constexpr int ASCII_ESCAPE {27};
-    static constexpr int ASCII_BACKSPACE {8};
-    static constexpr int ASCII_DELETE {127};
-    static constexpr int ASCII_NEW_LINE {10};
+    int input_window_height {3};
 
-    int rows, cols;
-    int input_window_height = 3;
+    WINDOW* win_msgs {nullptr};
+    WINDOW* win_input {nullptr};
 
-    WINDOW* win_msgs = nullptr;
-    WINDOW* win_input = nullptr;
-
-    std::vector<std::string> chat;
-    std::queue<std::string> msgQueue;
-    std::string input;
+    std::vector<std::string> chat {};
+    std::queue<std::string> msgQueue {};
+    std::string input {};
     
     const std::string prompt {"> "};
 

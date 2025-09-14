@@ -6,9 +6,9 @@
 #include <condition_variable>
 #include "proto/chat.grpc.pb.h"
 #include "proto/chat.pb.h"
-#include "include/simpleChatUI.h"
-#include "include/timeFunctions.h"
-#include "include/welcomeScreen.h"
+#include "include/UI/simpleChatUI.h"
+#include "include/UI/welcomeScreen.h"
+#include "include/Utility/timeFunctions.h"
 
 using clientReaderWriter = std::shared_ptr<grpc::ClientReaderWriter<ChatMessage, ChatMessage>>;
 

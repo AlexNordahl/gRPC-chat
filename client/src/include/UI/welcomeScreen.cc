@@ -4,20 +4,15 @@
 #include <cassert>
 
 WelcomeScreen::WelcomeScreen()
+    : BaseUI()
 {
-    initscr();
-    cbreak();
-    noecho();
-    keypad(stdscr, TRUE);
-    curs_set(1);
-    
     resizeWindow();
+    wbkgd(win_input, COLOR_PAIR(1));
 }
 
 WelcomeScreen::~WelcomeScreen()
 {
     delwin(win_input);
-    endwin();
 }
 
 void WelcomeScreen::start()

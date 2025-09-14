@@ -6,17 +6,8 @@
 #include <ctime>
 
 SimpleChatUI::SimpleChatUI()
+    : BaseUI()
 {
-    initscr();
-    cbreak();
-    noecho();
-    keypad(stdscr, TRUE);
-    curs_set(0);
-
-    start_color();
-	init_pair(1, COLOR_BLACK, COLOR_CYAN);
-    init_pair(2, COLOR_WHITE, COLOR_CYAN);
-
     getmaxyx(stdscr, rows, cols);
 
     win_msgs  = newwin(rows - input_window_height, cols, 0, 0);
