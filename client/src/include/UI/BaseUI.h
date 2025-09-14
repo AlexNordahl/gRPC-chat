@@ -3,6 +3,7 @@
 
 #include <ncurses.h>
 #include <string>
+#include "theme.h"
 
 class BaseUI
 {
@@ -16,15 +17,19 @@ public:
         curs_set(0);
 
         start_color();
-        init_pair(1, COLOR_BLACK, COLOR_BLUE);
-        init_pair(2, COLOR_WHITE, COLOR_BLUE);
-        bkgd(COLOR_PAIR(1)); clear(); refresh();
+        initTheme();
 
         getmaxyx(stdscr, rows, cols);
     }
 
     virtual ~BaseUI() { endwin(); }
 protected:
+    struct StyledMessage
+    {
+        std::string content {};
+        int color {};
+    };
+
     int rows{}, cols{};
 
     static constexpr int ASCII_ESCAPE {27};

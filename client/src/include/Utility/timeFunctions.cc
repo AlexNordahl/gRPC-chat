@@ -5,26 +5,28 @@
 #include <iomanip>
 #include <ctime>
 
-std::string convertProtobufTime(const google::protobuf::Timestamp& timeStamp, const std::string& format)
+constexpr std::string_view format {"[%Y-%m-%d %H:%M] "};
+
+std::string convertProtoTime(const google::protobuf::Timestamp& timeStamp)
 {
     time_t t = static_cast<time_t>(timeStamp.seconds());
     std::tm tm{};
     localtime_r(&t, &tm);
 
     std::ostringstream oss;
-    oss << std::put_time(&tm, format.c_str());
+    oss << std::put_time(&tm, format.data());
 
     return oss.str();
 }
 
-std::string getTimestampFormatted(const std::string &format)
+std::string getTimestamp()
 {
     time_t t = static_cast<time_t>(std::time(nullptr));
     std::tm tm{};
     localtime_r(&t, &tm);
 
     std::ostringstream oss;
-    oss << std::put_time(&tm, format.c_str());
+    oss << std::put_time(&tm, format.data());
 
     return oss.str();
 }

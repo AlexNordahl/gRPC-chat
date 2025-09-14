@@ -7,7 +7,6 @@ WelcomeScreen::WelcomeScreen()
     : BaseUI()
 {
     resizeWindow();
-    wbkgd(win_input, COLOR_PAIR(1));
 }
 
 WelcomeScreen::~WelcomeScreen()

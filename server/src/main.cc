@@ -10,21 +10,19 @@ class ChatServiceImpl : public ChatService::Service
 {
 private:
     std::mutex clients_mutex;
-    std::vector<::grpc::ServerReaderWriter<::ChatMessage, ::ChatMessage>*> clients;
+    std::vector<::grpc::ServerReaderWriter<::ChatEvent, ::ChatEvent>*> clients;
 
 public:
-    ::grpc::Status Chat([[maybe_unused]] ::grpc::ServerContext* context, ::grpc::ServerReaderWriter<::ChatMessage, ::ChatMessage>* stream) override
+    ::grpc::Status Chat(::grpc::ServerContext* context, ::grpc::ServerReaderWriter< ::ChatEvent, ::ChatEvent>* stream) override
     {
         {
             std::lock_guard<std::mutex> lock(clients_mutex);
             clients.push_back(stream);
         }
 
-        ChatMessage incoming; 
+        ChatEvent incoming; 
         while (stream->Read(&incoming))
         {
-            std::cout << convertTime(incoming.sent_at(), "[%Y-%m-%d %H:%M]") << " [" << incoming.username() << "]: " << incoming.text() << "\n";
-
             std::lock_guard<std::mutex> lock(clients_mutex);
             for (auto s : clients)
             {   

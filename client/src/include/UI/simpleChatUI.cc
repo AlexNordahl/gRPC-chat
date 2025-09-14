@@ -8,8 +8,6 @@
 SimpleChatUI::SimpleChatUI()
     : BaseUI()
 {
-    getmaxyx(stdscr, rows, cols);
-
     win_msgs  = newwin(rows - input_window_height, cols, 0, 0);
     win_input = newwin(input_window_height, cols, rows - input_window_height, 0);
     
@@ -21,9 +19,6 @@ SimpleChatUI::SimpleChatUI()
 
     draw_messages(win_msgs, chat);
     draw_input(win_input, prompt, input);
-
-    wbkgd(win_msgs, COLOR_PAIR(1));
-    wbkgd(win_input, COLOR_PAIR(1));
 }
 
 SimpleChatUI::~SimpleChatUI()
@@ -66,9 +61,9 @@ void SimpleChatUI::handleInput()
     }
 }
 
-void SimpleChatUI::addMessage(const std::string_view message)
+void SimpleChatUI::addMessage(const std::string_view message, int color)
 {
-    chat.push_back(message.data());
+    chat.push_back(StyledMessage{message.data(), color});
 }
 
 std::string SimpleChatUI::takeInput()
@@ -81,25 +76,25 @@ std::string SimpleChatUI::takeInput()
     return msg;
 }
 
-void SimpleChatUI::draw_messages(WINDOW *win, const std::vector<std::string> &msgs)
+void SimpleChatUI::draw_messages(WINDOW *win, const std::vector<StyledMessage> &msgs)
 {
     werase(win);
     box(win, 0, 0);
     int h, w; getmaxyx(win, h, w);
     int max_lines = h - 2;
-    int start = (int)msgs.size() > max_lines ? (int)msgs.size() - max_lines : 0;
+    int start = static_cast<int>(msgs.size()) > max_lines ? static_cast<int>(msgs.size()) - max_lines : 0;
     int y = 1;
 
     for (size_t i = start; i < msgs.size(); ++i, ++y) 
 	{
-        std::string line = msgs[i];
+        StyledMessage messgae {msgs[i]};
 
-        if ((int)line.size() > w - 2)
-            line.resize(w - 2);
-
-        wattron(win, COLOR_PAIR(2));
-        mvwprintw(win, y, 1, "%s", line.c_str());
-        wattroff(win, COLOR_PAIR(2));
+        if (static_cast<int>(messgae.content.size()) > w - 2)
+            messgae.content.resize(w - 2);
+        
+        wattron(win, COLOR_PAIR(messgae.color));
+        mvwprintw(win, y, 1, "%s", messgae.content.c_str());
+        wattroff(win, COLOR_PAIR(messgae.color));
     }
 
     wrefresh(win);
@@ -118,7 +113,6 @@ void SimpleChatUI::draw_input(WINDOW *win, const std::string_view prompt, const 
 	{
         view = view.substr(view.size() - (w - 2));
     }
-	
 
     mvwprintw(win, 1, 1, "%s", view.c_str());
     int curx = 1 + (int)view.size();
@@ -136,7 +130,8 @@ void SimpleChatUI::resizeWindow()
     if (r != rows or c != cols) 
     {
         rows = r; cols = c;
-        wclear(stdscr); refresh();
+        wclear(stdscr);
+        refresh();
         wresize(win_msgs, rows - input_window_height, cols);
         wresize(win_input, input_window_height, cols);
         mvwin(win_input, rows - input_window_height, 0);

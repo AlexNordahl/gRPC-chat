@@ -2,9 +2,19 @@ syntax = "proto3";
 
 import "google/protobuf/timestamp.proto";
 
-service ChatService 
+service ChatService
 {
-  rpc Chat(stream ChatMessage) returns (stream ChatMessage);
+  rpc Chat(stream ChatEvent) returns (stream ChatEvent);
+}
+
+message ChatEvent
+{
+  oneof payload
+  {
+    ChatMessage chat_message = 1;
+    UserJoined user_joined = 2;
+    UserLeft user_left = 3;
+  }
 }
 
 message ChatMessage 
@@ -12,4 +22,19 @@ message ChatMessage
   string username = 1;
   string text = 2;
   google.protobuf.Timestamp sent_at = 3;
+  int32 color = 4;
+}
+
+message UserJoined 
+{
+  string username = 1;
+  google.protobuf.Timestamp joined_at = 2;
+  int32 color = 4;
+}
+
+message UserLeft 
+{
+  string username = 1;
+  google.protobuf.Timestamp left_at = 2;
+  int32 color = 4;
 }

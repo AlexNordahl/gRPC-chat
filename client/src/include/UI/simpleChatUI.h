@@ -14,7 +14,7 @@ public:
     ~SimpleChatUI();
 
     void handleInput();
-    void addMessage(const std::string_view message);
+    void addMessage(const std::string_view message, int color);
     std::string takeInput();
     
 private:
@@ -23,13 +23,13 @@ private:
     WINDOW* win_msgs {nullptr};
     WINDOW* win_input {nullptr};
 
-    std::vector<std::string> chat {};
+    std::vector<StyledMessage> chat {};
     std::queue<std::string> msgQueue {};
     std::string input {};
     
     const std::string prompt {"> "};
 
-    void draw_messages(WINDOW* win, const std::vector<std::string>& msgs);
+    void draw_messages(WINDOW* win, const std::vector<StyledMessage>& msgs);
     void draw_input(WINDOW *win, const std::string_view prompt, const std::string_view content);
     void resizeWindow();
 };
