@@ -99,26 +99,17 @@ void writeThread(std::queue<std::string>& toSendQueue, clientReaderWriter& strea
         writeCondVar.wait(ul, [&]{ return !toSendQueue.empty(); });
 
         ChatEvent ev {};
-        switch (ev.payload_case())
-        {
-        case ChatEvent::kChatMessage:
-            ChatMessage* msg {ev.mutable_chat_message()};
-            google::protobuf::Timestamp* ts = msg->mutable_sent_at();
-            ts->set_seconds(std::time(nullptr));
+        ChatMessage* msg {ev.mutable_chat_message()};
+        google::protobuf::Timestamp* ts = msg->mutable_sent_at();
+        ts->set_seconds(std::time(nullptr));
 
-            msg->set_username(username);
-            msg->set_text(toSendQueue.front());
-            msg->set_color(Color::White);
-            break;
-        case ChatEvent::kUserJoined:
-            // to do
-            break;
-        case ChatEvent::kUserLeft:
-            // to do
-            break;
-        }
+        msg->set_username(username);
+        msg->set_text(toSendQueue.front());
+        msg->set_color(Color::White);
         
         toSendQueue.pop();
+        ul.unlock(); 
+
         stream->Write(ev);
     }
 }
