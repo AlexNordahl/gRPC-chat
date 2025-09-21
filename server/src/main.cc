@@ -15,7 +15,7 @@ public:
         clients.push_back(stream);
         clients_mutex.unlock();
 
-        ChatEvent incoming; 
+        ChatEvent incoming;
         while (stream->Read(&incoming))
         {
             switch (incoming.payload_case())
@@ -44,7 +44,14 @@ public:
                     usernames_mutex.lock();
                     auto it {usernames.find(incoming.user_left().username())};
                     usernames.erase(it);
+                    
+                    ChatEvent ev {};
+                    UserList* userList = ev.mutable_user_list();
+                    for (const auto& u : usernames)
+                        userList->add_usernames(u);
                     usernames_mutex.unlock();
+                    
+                    broadcast(stream, ev, false);
                     break;
                 }
             }

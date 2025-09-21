@@ -17,6 +17,7 @@ using clientReaderWriter = std::shared_ptr<grpc::ClientReaderWriter<ChatEvent, C
 std::condition_variable writeCondVar;
 std::mutex toSendMutex;
 std::mutex incomingMutex;
+const std::string quitCommand {"/quit"};
 
 void uiThread(std::queue<std::string>& toSendQueue, std::queue<ChatEvent>& incomingQueue, std::string username)
 {
@@ -30,10 +31,14 @@ void uiThread(std::queue<std::string>& toSendQueue, std::queue<ChatEvent>& incom
         input = UI.takeInput();
         if (!input.empty())
         {
-            {
-                std::lock_guard<std::mutex> lg(toSendMutex);
-                toSendQueue.push(input);
+            if (input == quitCommand)
+            {   
+                { std::lock_guard<std::mutex> lg(toSendMutex); toSendQueue.push(input); }
+                writeCondVar.notify_one();
+                break;
             }
+
+            { std::lock_guard<std::mutex> lg(toSendMutex); toSendQueue.push(input); }
             writeCondVar.notify_one();
             UI.addMessage(getTimestamp() + "[" + username + "]: " + input, Color::White);
         }
@@ -69,15 +74,31 @@ void uiThread(std::queue<std::string>& toSendQueue, std::queue<ChatEvent>& incom
     }
 }
 
-void writeThread(std::queue<std::string>& toSendQueue, clientReaderWriter& stream, const std::string_view username)
+static inline void userJoined(ChatEvent& ev, clientReaderWriter& stream, const std::string_view username)
 {
-    ChatEvent ev {};
     UserJoined* joined = ev.mutable_user_joined();
     auto* ts = joined->mutable_joined_at();
     ts->set_seconds(std::time(nullptr));
     joined->set_username(std::string(username));
     joined->set_color(Color::White);
     stream->Write(ev);
+}
+
+static inline void userLeft(ChatEvent& ev, clientReaderWriter& stream, const std::string_view username)
+{
+    auto* left = ev.mutable_user_left();
+    left->mutable_left_at()->set_seconds(std::time(nullptr));
+    left->set_username(std::string(username));
+    left->set_color(Color::White);
+    (void)stream->Write(ev);
+    stream->WritesDone();
+}
+
+void writeThread(std::queue<std::string>& toSendQueue, clientReaderWriter& stream, const std::string_view username)
+{
+    ChatEvent ev {};
+
+    userJoined(ev, stream, username);
 
     while (true)
     {
@@ -87,6 +108,12 @@ void writeThread(std::queue<std::string>& toSendQueue, clientReaderWriter& strea
         std::string text = toSendQueue.front();
         toSendQueue.pop();
         ul.unlock();
+
+        if (text == quitCommand)
+        {
+            userLeft(ev, stream, username);
+            break;      
+        }
 
         ChatMessage* msg = ev.mutable_chat_message();
         auto* ts = msg->mutable_sent_at();
