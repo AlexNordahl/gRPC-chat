@@ -8,8 +8,11 @@
 SimpleChatUI::SimpleChatUI()
     : BaseUI()
 {
-    win_msgs  = newwin(rows - input_window_height, cols, 0, 0);
-    win_input = newwin(input_window_height, cols, rows - input_window_height, 0);
+    int msgs_width = std::max(10, cols - sidebar_width);
+
+    win_msgs = newwin(rows - input_window_height, msgs_width, 0, 0);
+    win_input = newwin(input_window_height, msgs_width, rows - input_window_height, 0);
+    win_side  = newwin(rows, sidebar_width, 0, msgs_width);
     
     scrollok(win_msgs, TRUE);
     wtimeout(win_input, 100);
@@ -18,6 +21,7 @@ SimpleChatUI::SimpleChatUI()
     keypad(win_msgs, TRUE);
 
     draw_messages(win_msgs, chat);
+    draw_sidebar(win_side, users);
     draw_input(win_input, prompt, input);
 }
 
@@ -25,12 +29,14 @@ SimpleChatUI::~SimpleChatUI()
 {
     delwin(win_input);
     delwin(win_msgs);
+    delwin(win_side);
     endwin();
 }
 
 void SimpleChatUI::handleInput()
 {
     draw_messages(win_msgs, chat);
+    draw_sidebar(win_side, users);
     resizeWindow();
 
     int ch = wgetch(win_input);
@@ -74,6 +80,11 @@ std::string SimpleChatUI::takeInput()
     std::string msg = msgQueue.front();
     msgQueue.pop();
     return msg;
+}
+
+void SimpleChatUI::UpdateUsers(const std::vector<std::string>& usernames)
+{
+    users = std::move(usernames);
 }
 
 void SimpleChatUI::draw_messages(WINDOW *win, const std::vector<StyledMessage> &msgs)
@@ -124,18 +135,53 @@ void SimpleChatUI::draw_input(WINDOW *win, const std::string_view prompt, const 
     wrefresh(win);
 }
 
+void SimpleChatUI::draw_sidebar(WINDOW* win, const std::vector<std::string>& users)
+{
+    werase(win);
+    box(win, 0, 0);
+
+    int h, w; getmaxyx(win, h, w);
+    std::string title = " Users (" + std::to_string(users.size()) + ") ";
+    if ((int)title.size() > w-2) title.resize(w-2);
+    mvwprintw(win, 0, 1, "%s", title.c_str());
+
+    int y = 1;
+    for (const auto& name : users)
+    {
+        if (y >= h-1) break;
+        std::string line = name;
+        if (static_cast<int>(line.size()) > w-2) line.resize(w-2);
+        mvwprintw(win, y++, 1, "%s", line.c_str());
+    }
+
+    wrefresh(win);
+}
+
 void SimpleChatUI::resizeWindow()
 {
     int r, c; getmaxyx(stdscr, r, c);
-    if (r != rows or c != cols) 
+    if (r != rows || c != cols)
     {
         rows = r; cols = c;
         wclear(stdscr);
         refresh();
-        wresize(win_msgs, rows - input_window_height, cols);
-        wresize(win_input, input_window_height, cols);
+
+        int msgs_width = std::max(10, cols - sidebar_width);
+
+        wresize(win_msgs, rows - input_window_height, msgs_width);
+        wresize(win_input, input_window_height, msgs_width);
         mvwin(win_input, rows - input_window_height, 0);
+
+        if (!win_side)
+            win_side = newwin(rows, sidebar_width, 0, cols - sidebar_width);
+        else
+        {
+            wresize(win_side, rows, sidebar_width);
+            mvwin(win_side, 0, cols - sidebar_width);
+        }
+
         draw_messages(win_msgs, chat);
+        draw_sidebar(win_side, users);
         draw_input(win_input, prompt, input);
     }
 }

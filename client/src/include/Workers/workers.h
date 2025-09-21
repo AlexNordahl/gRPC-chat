@@ -38,16 +38,31 @@ void uiThread(std::queue<std::string>& toSendQueue, std::queue<ChatEvent>& incom
             UI.addMessage(getTimestamp() + "[" + username + "]: " + input, Color::White);
         }
 
+        std::lock_guard<std::mutex> lock(incomingMutex);
+        while (!incomingQueue.empty())
         {
-            std::lock_guard<std::mutex> lock(incomingMutex);
-            while (!incomingQueue.empty())
-            {
-                ChatEvent incomingMsg = incomingQueue.front();
-                incomingQueue.pop();
+            ChatEvent event = incomingQueue.front();
+            incomingQueue.pop();
 
-                if (incomingMsg.payload_case() == ChatEvent::kChatMessage) {
-                    const ChatMessage& msg = incomingMsg.chat_message();
+            switch (event.payload_case())
+            {
+                case ChatEvent::kChatMessage:
+                {
+                    const ChatMessage& msg = event.chat_message();
                     UI.addMessage(convertProtoTime(msg.sent_at()) + "[" + msg.username() + "]: " + msg.text(), msg.color());
+                    break;
+                }
+                case ChatEvent::kUserList:
+                {
+                    std::vector<std::string> usernames {};
+                    for (const auto& name : event.user_list().usernames())
+                        usernames.push_back(name);
+                    UI.UpdateUsers(usernames);
+                    break;
+                }
+                case ChatEvent::PAYLOAD_NOT_SET:
+                {
+                    break;
                 }
             }
         }
@@ -56,6 +71,14 @@ void uiThread(std::queue<std::string>& toSendQueue, std::queue<ChatEvent>& incom
 
 void writeThread(std::queue<std::string>& toSendQueue, clientReaderWriter& stream, const std::string_view username)
 {
+    ChatEvent ev {};
+    UserJoined* joined = ev.mutable_user_joined();
+    auto* ts = joined->mutable_joined_at();
+    ts->set_seconds(std::time(nullptr));
+    joined->set_username(std::string(username));
+    joined->set_color(Color::White);
+    stream->Write(ev);
+
     while (true)
     {
         std::unique_lock<std::mutex> ul(toSendMutex);
@@ -64,7 +87,7 @@ void writeThread(std::queue<std::string>& toSendQueue, clientReaderWriter& strea
         std::string text = toSendQueue.front();
         toSendQueue.pop();
         ul.unlock();
-        ChatEvent ev {};
+
         ChatMessage* msg = ev.mutable_chat_message();
         auto* ts = msg->mutable_sent_at();
         ts->set_seconds(std::time(nullptr));
@@ -72,16 +95,19 @@ void writeThread(std::queue<std::string>& toSendQueue, clientReaderWriter& strea
         msg->set_text(text);
         msg->set_color(Color::White);
 
-        if (!stream->Write(ev)) break;
+        if (!stream->Write(ev))
+            break;
     }
 }
 
 void readThread(std::queue<ChatEvent>& incomingQueue, clientReaderWriter& stream)
 {
+    ChatEvent ev {};
     while (true)
     {
-        ChatEvent ev {};
-        if (!stream->Read(&ev)) break;
+        if (!stream->Read(&ev))
+            break;
+
         std::lock_guard<std::mutex> lock(incomingMutex);
         incomingQueue.push(ev);
     }

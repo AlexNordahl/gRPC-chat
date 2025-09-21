@@ -11,6 +11,9 @@ public:
     BaseUI()
     {
         initscr();
+        refresh();
+        resize_term(0, 0);
+        getmaxyx(stdscr, rows, cols);
         cbreak();
         noecho();
         keypad(stdscr, TRUE);
