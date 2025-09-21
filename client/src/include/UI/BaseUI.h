@@ -36,9 +36,6 @@ protected:
     static constexpr int ASCII_BACKSPACE {8};
     static constexpr int ASCII_DELETE {127};
     static constexpr int ASCII_NEW_LINE {10};
-
-    size_t usernameSizeMin {};
-    size_t usernameSizeLimit {};
 };
 
 #endif

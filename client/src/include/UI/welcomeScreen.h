@@ -23,6 +23,9 @@ private:
 
     std::string input {};
     std::string prompt {"Please enter nick: "};
+
+    size_t usernameSizeMin {4};
+    size_t usernameSizeLimit {15};
 };
 
 #endif
