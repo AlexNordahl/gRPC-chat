@@ -3,7 +3,7 @@
 
 #include <ncurses.h>
 #include <string>
-#include "BaseUI.h"
+#include "baseUI.h"
 
 class WelcomeScreen : public BaseUI
 {
@@ -12,7 +12,6 @@ public:
     ~WelcomeScreen();
 
     void start();
-    void setUsernameSizeBounds(int min, int limit);
     const std::string& username() const { return input; }
 
 private:

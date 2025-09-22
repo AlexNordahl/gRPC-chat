@@ -8,7 +8,7 @@
 SimpleChatUI::SimpleChatUI()
     : BaseUI()
 {
-    int msgs_width = std::max(10, cols - sidebar_width);
+    int msgs_width {std::max(10, cols - sidebar_width)};
 
     win_msgs = newwin(rows - input_window_height, msgs_width, 0, 0);
     win_input = newwin(input_window_height, msgs_width, rows - input_window_height, 0);
@@ -39,7 +39,7 @@ void SimpleChatUI::handleInput()
     draw_sidebar(win_side, users);
     resizeWindow();
 
-    int ch = wgetch(win_input);
+    int ch {wgetch(win_input)};
     if (ch == ASCII_ESCAPE) 
     {
         return;
@@ -92,9 +92,9 @@ void SimpleChatUI::draw_messages(WINDOW *win, const std::vector<StyledMessage> &
     werase(win);
     box(win, 0, 0);
     int h, w; getmaxyx(win, h, w);
-    int max_lines = h - 2;
-    int start = static_cast<int>(msgs.size()) > max_lines ? static_cast<int>(msgs.size()) - max_lines : 0;
-    int y = 1;
+    int max_lines {h - 2};
+    int start {static_cast<int>(msgs.size()) > max_lines ? static_cast<int>(msgs.size()) - max_lines : 0};
+    int y {1};
 
     for (size_t i = start; i < msgs.size(); ++i, ++y) 
 	{
@@ -115,8 +115,7 @@ void SimpleChatUI::draw_input(WINDOW *win, const std::string_view prompt, const 
 {
     werase(win);
     box(win, 0, 0);
-    [[maybe_unused]] int h, w;
-    getmaxyx(win, h, w);
+    [[maybe_unused]]int h, w; getmaxyx(win, h, w);
     std::string view = std::string(prompt) + std::string(content);
     size_t width {static_cast<size_t>(w - 2)};
 
@@ -141,17 +140,24 @@ void SimpleChatUI::draw_sidebar(WINDOW* win, const std::vector<std::string>& use
     box(win, 0, 0);
 
     int h, w; getmaxyx(win, h, w);
-    std::string title = " Users (" + std::to_string(users.size()) + ") ";
-    if ((int)title.size() > w-2) title.resize(w-2);
+    std::string title {" Users (" + std::to_string(users.size()) + ") "};
+    if (static_cast<int>(title.size()) > w-2) 
+        title.resize(w-2);
+    
     mvwprintw(win, 0, 1, "%s", title.c_str());
 
-    int y = 1;
+    int y {1};
     for (const auto& name : users)
     {
-        if (y >= h-1) break;
-        std::string line = name;
-        if (static_cast<int>(line.size()) > w-2) line.resize(w-2);
+        if (y >= h - 1) 
+            break;
+
+        std::string line {name};
+        if (static_cast<int>(line.size()) > w-2) line.resize(w - 2);
+
+        wattron(win, COLOR_PAIR(Color::Notify));
         mvwprintw(win, y++, 1, "%s", line.c_str());
+        wattroff(win, COLOR_PAIR(Color::Notify));
     }
 
     wrefresh(win);
@@ -160,7 +166,7 @@ void SimpleChatUI::draw_sidebar(WINDOW* win, const std::vector<std::string>& use
 void SimpleChatUI::resizeWindow()
 {
     int r, c; getmaxyx(stdscr, r, c);
-    if (r != rows || c != cols)
+    if (r != rows or c != cols)
     {
         rows = r; cols = c;
         wclear(stdscr);

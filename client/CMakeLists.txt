@@ -20,7 +20,6 @@ add_executable(main
     src/main.cc
     src/include/UI/simpleChatUI.cc
     src/include/UI/welcomeScreen.cc
-    src/include/Utility/timeFunctions.cc
 )
 
 target_compile_features(main PRIVATE cxx_std_20)

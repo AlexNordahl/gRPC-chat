@@ -19,7 +19,7 @@ std::mutex toSendMutex;
 std::mutex incomingMutex;
 const std::string quitCommand {"/quit"};
 
-void uiThread(std::queue<std::string>& toSendQueue, std::queue<ChatEvent>& incomingQueue, std::string username)
+void uiThread(std::queue<std::string>& toSendQueue, std::queue<ChatEvent>& incomingQueue, std::string_view username)
 {
     SimpleChatUI UI {};
     std::string input {};
@@ -40,7 +40,7 @@ void uiThread(std::queue<std::string>& toSendQueue, std::queue<ChatEvent>& incom
 
             { std::lock_guard<std::mutex> lg(toSendMutex); toSendQueue.push(input); }
             writeCondVar.notify_one();
-            UI.addMessage(getTimestamp() + "[" + username + "]: " + input, Color::White);
+            UI.addMessage(getTimestamp() + "[" + username.data() + "]: " + input, Color::White);
         }
 
         std::lock_guard<std::mutex> lock(incomingMutex);
@@ -65,10 +65,12 @@ void uiThread(std::queue<std::string>& toSendQueue, std::queue<ChatEvent>& incom
                     UI.UpdateUsers(usernames);
                     break;
                 }
-                case ChatEvent::PAYLOAD_NOT_SET:
-                {
+                case ChatEvent::kUserJoined:
                     break;
-                }
+                case ChatEvent::kUserLeft:
+                    break;
+                case ChatEvent::PAYLOAD_NOT_SET:
+                    break;
             }
         }
     }
@@ -76,22 +78,20 @@ void uiThread(std::queue<std::string>& toSendQueue, std::queue<ChatEvent>& incom
 
 static inline void userJoined(ChatEvent& ev, clientReaderWriter& stream, const std::string_view username)
 {
-    UserJoined* joined = ev.mutable_user_joined();
-    auto* ts = joined->mutable_joined_at();
-    ts->set_seconds(std::time(nullptr));
+    UserJoined* joined {ev.mutable_user_joined()};
+    joined->mutable_joined_at()->set_seconds(std::time(nullptr));
     joined->set_username(std::string(username));
-    joined->set_color(Color::White);
+    joined->set_color(Color::Notify);
     stream->Write(ev);
 }
 
 static inline void userLeft(ChatEvent& ev, clientReaderWriter& stream, const std::string_view username)
 {
-    auto* left = ev.mutable_user_left();
+    UserLeft* left {ev.mutable_user_left()};
     left->mutable_left_at()->set_seconds(std::time(nullptr));
     left->set_username(std::string(username));
-    left->set_color(Color::White);
-    (void)stream->Write(ev);
-    stream->WritesDone();
+    left->set_color(Color::Notify);
+    stream->Write(ev);
 }
 
 void writeThread(std::queue<std::string>& toSendQueue, clientReaderWriter& stream, const std::string_view username)
@@ -112,6 +112,7 @@ void writeThread(std::queue<std::string>& toSendQueue, clientReaderWriter& strea
         if (text == quitCommand)
         {
             userLeft(ev, stream, username);
+            stream->WritesDone();
             break;      
         }
 

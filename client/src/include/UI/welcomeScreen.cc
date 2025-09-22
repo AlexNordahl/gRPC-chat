@@ -59,15 +59,6 @@ void WelcomeScreen::start()
     }
 }
 
-void WelcomeScreen::setUsernameSizeBounds(int min, int limit)
-{
-    assert(min > 0);
-    assert(limit > 0);
-
-    usernameSizeMin = min;
-    usernameSizeLimit = limit;
-}
-
 void WelcomeScreen::draw_input(WINDOW *win, const std::string& prompt, const std::string &content)
 {
     werase(win);
