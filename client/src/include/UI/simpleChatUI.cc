@@ -103,9 +103,7 @@ void SimpleChatUI::draw_messages(WINDOW *win, const std::vector<StyledMessage> &
         if (static_cast<int>(messgae.content.size()) > w - 2)
             messgae.content.resize(w - 2);
         
-        wattron(win, COLOR_PAIR(messgae.color));
         mvwprintw(win, y, 1, "%s", messgae.content.c_str());
-        wattroff(win, COLOR_PAIR(messgae.color));
     }
 
     wrefresh(win);
@@ -125,7 +123,7 @@ void SimpleChatUI::draw_input(WINDOW *win, const std::string_view prompt, const 
     }
 
     mvwprintw(win, 1, 1, "%s", view.c_str());
-    int curx = 1 + (int)view.size();
+    int curx = 1 + static_cast<int>(view.size());
 
     if (curx >= w - 1)
         curx = w - 2;
@@ -140,11 +138,13 @@ void SimpleChatUI::draw_sidebar(WINDOW* win, const std::vector<std::string>& use
     box(win, 0, 0);
 
     int h, w; getmaxyx(win, h, w);
-    std::string title {" Users (" + std::to_string(users.size()) + ") "};
-    if (static_cast<int>(title.size()) > w-2) 
+    std::string title {" Logged Users (" + std::to_string(users.size()) + ") "};
+    if (static_cast<int>(title.size()) > w - 2) 
         title.resize(w-2);
     
+    wattron(win, COLOR_PAIR(Color::Magenta));
     mvwprintw(win, 0, 1, "%s", title.c_str());
+    wattroff(win, COLOR_PAIR(Color::Magenta));
 
     int y {1};
     for (const auto& name : users)
@@ -153,7 +153,7 @@ void SimpleChatUI::draw_sidebar(WINDOW* win, const std::vector<std::string>& use
             break;
 
         std::string line {name};
-        if (static_cast<int>(line.size()) > w-2) line.resize(w - 2);
+        if (static_cast<int>(line.size()) > w - 2) line.resize(w - 2);
 
         wattron(win, COLOR_PAIR(Color::Cyan));
         mvwprintw(win, y++, 1, "%s", line.c_str());

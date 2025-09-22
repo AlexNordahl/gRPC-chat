@@ -18,18 +18,18 @@
             }
             case ChatEvent::kUserJoined:
             {
-                usernames_mutex.lock();
-                
-                usernames.insert(incoming.user_joined().username());
+                ChatEvent userListEvent {};
 
-                ChatEvent ev {};
-                UserList* userList = ev.mutable_user_list();
-                for (const auto& u : usernames)
-                    userList->add_usernames(u);
-
-                usernames_mutex.unlock();
+                {
+                    std::lock_guard<std::mutex> lg(usernames_mutex);
+                    usernames.insert(incoming.user_joined().username());
+                    UserList* userList = userListEvent.mutable_user_list();
+                    for (const auto& u : usernames)
+                        userList->add_usernames(u);
+                }
                 
-                broadcast(stream, ev, true);
+                broadcast(stream, incoming, true);
+                broadcast(stream, userListEvent, true);
                 break;
             }
             case ChatEvent::kUserLeft:
@@ -46,6 +46,7 @@
 
                 usernames_mutex.unlock();
                 
+                broadcast(stream, incoming, false);
                 broadcast(stream, ev, false);
                 break;
             }
