@@ -36,7 +36,6 @@ Below is an example screenshot of the chat client in action:
 I wanted to keep this project simple and not let feature creep in but here are some ideas for the future:
 - Improved concurrency using a **multithreaded queue** for better performance
 - Persistent message history (e.g., storing logs in a database)
-- Support for private messaging between users
 - Encrypted communication for better security
 - Tests and gRPC performance benchmarking
 - Heavier optimization
@@ -44,7 +43,17 @@ I wanted to keep this project simple and not let feature creep in but here are s
 ## Build Instructions
 
 ```bash
-mkdir build && cd build
+docker build -t grpc-chat .
+
+docker run -it --rm grpc-chat /bin/bash
+
+# inside container
+cd mnt/server/build
+cmake ..
+make
+
+# go back to mnt
+cd client/build
 cmake ..
 make
 ```
