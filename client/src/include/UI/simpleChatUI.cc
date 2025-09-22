@@ -155,9 +155,9 @@ void SimpleChatUI::draw_sidebar(WINDOW* win, const std::vector<std::string>& use
         std::string line {name};
         if (static_cast<int>(line.size()) > w-2) line.resize(w - 2);
 
-        wattron(win, COLOR_PAIR(Color::Notify));
+        wattron(win, COLOR_PAIR(Color::Cyan));
         mvwprintw(win, y++, 1, "%s", line.c_str());
-        wattroff(win, COLOR_PAIR(Color::Notify));
+        wattroff(win, COLOR_PAIR(Color::Cyan));
     }
 
     wrefresh(win);

@@ -65,12 +65,9 @@ void uiThread(std::queue<std::string>& toSendQueue, std::queue<ChatEvent>& incom
                     UI.UpdateUsers(usernames);
                     break;
                 }
-                case ChatEvent::kUserJoined:
-                    break;
-                case ChatEvent::kUserLeft:
-                    break;
-                case ChatEvent::PAYLOAD_NOT_SET:
-                    break;
+                case ChatEvent::kUserJoined: break;
+                case ChatEvent::kUserLeft: break;
+                case ChatEvent::PAYLOAD_NOT_SET: break;
             }
         }
     }
@@ -81,7 +78,7 @@ static inline void userJoined(ChatEvent& ev, clientReaderWriter& stream, const s
     UserJoined* joined {ev.mutable_user_joined()};
     joined->mutable_joined_at()->set_seconds(std::time(nullptr));
     joined->set_username(std::string(username));
-    joined->set_color(Color::Notify);
+    joined->set_color(Color::Yellow);
     stream->Write(ev);
 }
 
@@ -90,7 +87,7 @@ static inline void userLeft(ChatEvent& ev, clientReaderWriter& stream, const std
     UserLeft* left {ev.mutable_user_left()};
     left->mutable_left_at()->set_seconds(std::time(nullptr));
     left->set_username(std::string(username));
-    left->set_color(Color::Notify);
+    left->set_color(Color::Yellow);
     stream->Write(ev);
 }
 

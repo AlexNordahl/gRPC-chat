@@ -49,10 +49,8 @@
                 broadcast(stream, ev, false);
                 break;
             }
-            case ChatEvent::kUserList:
-                break;
-            case ChatEvent::PAYLOAD_NOT_SET:
-                break;
+            case ChatEvent::kUserList: break;
+            case ChatEvent::PAYLOAD_NOT_SET: break;
         }
     }
 
