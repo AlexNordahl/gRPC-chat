@@ -4,7 +4,7 @@
 
 Below is an example screenshot of the chat client in action:
 
-![Chat Example](https://github.com/AlexNordahl/gRPC-chat/visual-examples/example.png)
+![Chat Example](https://github.com/AlexNordahl/gRPC-chat/blob/main/visual-examples/example.png)
 
 This project is a simple **terminal-based chat client** implemented in **C++** using **gRPC**.
 It demonstrates how to build a **bidirectional streaming application**, where multiple users can exchange messages in real time.
