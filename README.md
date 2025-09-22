@@ -25,11 +25,7 @@ Below is an example screenshot of the chat client in action:
 - **main.cpp** – entry point with client logic  
 
 ## Requirements
-- C++20 compiler
-- gRPC and Protocol Buffers installed
-- ncurses installed
-- CMake (recommended for building)
-
+- Everything required is included in Dockerfile
 
 ## Future Improvements
 
