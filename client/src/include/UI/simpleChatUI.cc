@@ -103,7 +103,9 @@ void SimpleChatUI::draw_messages(WINDOW *win, const std::vector<StyledMessage> &
         if (static_cast<int>(messgae.content.size()) > w - 2)
             messgae.content.resize(w - 2);
         
+        wattron(win, COLOR_PAIR(messgae.color));
         mvwprintw(win, y, 1, "%s", messgae.content.c_str());
+        wattroff(win, COLOR_PAIR(messgae.color));
     }
 
     wrefresh(win);
@@ -142,9 +144,7 @@ void SimpleChatUI::draw_sidebar(WINDOW* win, const std::vector<std::string>& use
     if (static_cast<int>(title.size()) > w - 2) 
         title.resize(w-2);
     
-    wattron(win, COLOR_PAIR(Color::Magenta));
     mvwprintw(win, 0, 1, "%s", title.c_str());
-    wattroff(win, COLOR_PAIR(Color::Magenta));
 
     int y {1};
     for (const auto& name : users)
