@@ -44,12 +44,11 @@ docker build -t grpc-chat .
 docker run -it --rm grpc-chat /bin/bash
 
 # inside container
-cd mnt/server/build
+cd mnt/server
+mkdir build
+cd build
 cmake ..
 make
 
-# go back to mnt
-cd client/build
-cmake ..
-make
+# same steps as above inside server directory
 ```
