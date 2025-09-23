@@ -1,5 +1,5 @@
 #ifndef WORKERS_H
-#define WORKERS
+#define WORKERS_H
 
 #include "proto/chat.grpc.pb.h"
 #include "proto/chat.pb.h"
